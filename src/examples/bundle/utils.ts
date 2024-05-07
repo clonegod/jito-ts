@@ -10,7 +10,7 @@ import {
 import {SearcherClient} from '../../sdk/block-engine/searcher';
 import {Bundle} from '../../sdk/block-engine/types';
 import {isError} from '../../sdk/block-engine/utils';
-import {swap} from '../jupiter/swap';
+import {swap} from '../jupiter/swap_ix';
 const bs58 = require('bs58');
 
 const MEMO_PROGRAM_ID = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo';
@@ -46,22 +46,21 @@ export const sendBundles = async (
 
   let maybeBundle = b.addTransactions(
     // buildMemoTransaction(keypair, 'jito test 1', blockHash.blockhash),
-    // buildMemoTransaction(keypair, 'jito test 2', blockHash.blockhash)
-    // buildMemoTransaction(keypair, 'jito + jupiter', blockHash.blockhash),
-    await buildSawpTransaction(keypair)
+    // buildMemoTransaction(keypair, 'jito test 2', blockHash.blockhash),
+    await buildSawpTransaction(conn, keypair)
   );
   if (isError(maybeBundle)) {
     throw maybeBundle;
   }
 
-  const tipLamports = parseInt(process.env.TIP_LAMPORTS || '1000');
+  // const tipLamports = parseInt(process.env.TIP_LAMPORTS || '1000');
 
-  maybeBundle = maybeBundle.addTipTx(
-    keypair,
-    tipLamports,
-    tipAccount,
-    blockHash.blockhash
-  );
+  // maybeBundle = maybeBundle.addTipTx(
+  //   keypair,
+  //   tipLamports,
+  //   tipAccount,
+  //   blockHash.blockhash
+  // );
 
   if (isError(maybeBundle)) {
     throw maybeBundle;
@@ -123,6 +122,7 @@ const buildMemoTransaction = (
 };
 
 const buildSawpTransaction = async (
+  connection: Connection,
   payer: Keypair
 ): Promise<VersionedTransaction> => {
   const inputMint = process.env.INPUT_MINT || '';
@@ -138,6 +138,7 @@ const buildSawpTransaction = async (
   console.log('SLIPPAGE_BPS:', slippageBps);
 
   const swapTransaction = await swap(
+    connection,
     payer,
     inputMint,
     outputMint,

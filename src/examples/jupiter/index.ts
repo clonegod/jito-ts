@@ -2,9 +2,14 @@ require('dotenv').config();
 
 import {Connection, Keypair} from '@solana/web3.js';
 import * as Fs from 'fs';
-import {swap} from './swap';
+import {swap} from './swap_ix';
 
 const main = async () => {
+  const connection = new Connection(
+    'https://mainnet.helius-rpc.com/?api-key=07de6edd-4b17-4a93-9bd7-0fe17de22f67',
+    'confirmed'
+  );
+
   const payerKeypairPath = process.env.PAYER_KEYPAIR_PATH || '';
   console.log('PAYER_KEYPAIR_PATH:', payerKeypairPath);
   const payer = Keypair.fromSecretKey(
@@ -14,6 +19,7 @@ const main = async () => {
   );
 
   const transaction = await swap(
+    connection,
     payer,
     'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
     'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
@@ -26,10 +32,6 @@ const main = async () => {
   // Execute the transaction
   const rawTransaction = transaction.serialize();
 
-  const connection = new Connection(
-    'https://mainnet.helius-rpc.com/?api-key=07de6edd-4b17-4a93-9bd7-0fe17de22f67',
-    'confirmed'
-  );
   const txid = await connection.sendRawTransaction(rawTransaction, {
     skipPreflight: true,
     maxRetries: 2,
