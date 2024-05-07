@@ -10,7 +10,7 @@ import {
 
 import * as web3 from '@solana/web3.js';
 
-export const swap = async (
+export const swapIx = async (
   connection: Connection,
   keypair: Keypair,
   inputMint: string,

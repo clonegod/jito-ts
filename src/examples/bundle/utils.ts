@@ -10,7 +10,7 @@ import {
 import {SearcherClient} from '../../sdk/block-engine/searcher';
 import {Bundle} from '../../sdk/block-engine/types';
 import {isError} from '../../sdk/block-engine/utils';
-import {swap} from '../jupiter/swap_ix';
+import {swapIx} from '../jupiter/swap_ix';
 const bs58 = require('bs58');
 
 const MEMO_PROGRAM_ID = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo';
@@ -47,7 +47,7 @@ export const sendBundles = async (
   let maybeBundle = b.addTransactions(
     // buildMemoTransaction(keypair, 'jito test 1', blockHash.blockhash),
     // buildMemoTransaction(keypair, 'jito test 2', blockHash.blockhash),
-    await buildSawpTransaction(conn, keypair)
+    await buildSawpTransaction(conn, keypair, tipAccount)
   );
   if (isError(maybeBundle)) {
     throw maybeBundle;
@@ -123,7 +123,8 @@ const buildMemoTransaction = (
 
 const buildSawpTransaction = async (
   connection: Connection,
-  payer: Keypair
+  payer: Keypair,
+  tipAccount: PublicKey
 ): Promise<VersionedTransaction> => {
   const inputMint = process.env.INPUT_MINT || '';
   console.log('INPUT_MINT:', inputMint);
@@ -137,13 +138,14 @@ const buildSawpTransaction = async (
   const slippageBps = parseInt(process.env.SLIPPAGE_BPS || '30');
   console.log('SLIPPAGE_BPS:', slippageBps);
 
-  const swapTransaction = await swap(
+  const swapTransaction = await swapIx(
     connection,
     payer,
     inputMint,
     outputMint,
     inputAmout,
-    slippageBps
+    slippageBps,
+    tipAccount
   );
 
   return swapTransaction;

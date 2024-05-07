@@ -2,7 +2,7 @@ require('dotenv').config();
 
 import {Connection, Keypair, PublicKey} from '@solana/web3.js';
 import * as Fs from 'fs';
-import {swap} from './swap_ix';
+import {swap} from './swap';
 
 const main = async () => {
   const connection = new Connection(
@@ -19,13 +19,11 @@ const main = async () => {
   );
 
   const transaction = await swap(
-    connection,
     payer,
     'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
     'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     10 * 1e6,
-    15,
-    new PublicKey('2TYv4Tn9raGVs6peco6EkVRKVZt7WwMVNpn5mWEaP7fK')
+    15
   );
 
   console.log(`transaction=`, JSON.stringify(transaction));
