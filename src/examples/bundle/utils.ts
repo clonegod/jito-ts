@@ -10,6 +10,7 @@ import {
 import {SearcherClient} from '../../sdk/block-engine/searcher';
 import {Bundle} from '../../sdk/block-engine/types';
 import {isError} from '../../sdk/block-engine/utils';
+import {swap} from '../jupiter/swap';
 const bs58 = require('bs58');
 
 const MEMO_PROGRAM_ID = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo';
@@ -44,8 +45,10 @@ export const sendBundles = async (
   let bundles = [b];
 
   let maybeBundle = b.addTransactions(
-    buildMemoTransaction(keypair, 'jito test 1', blockHash.blockhash),
-    buildMemoTransaction(keypair, 'jito test 2', blockHash.blockhash)
+    // buildMemoTransaction(keypair, 'jito test 1', blockHash.blockhash),
+    // buildMemoTransaction(keypair, 'jito test 2', blockHash.blockhash)
+    buildMemoTransaction(keypair, 'jito + jupiter', blockHash.blockhash),
+    await buildSawpTransaction(keypair)
   );
   if (isError(maybeBundle)) {
     throw maybeBundle;
@@ -116,4 +119,17 @@ const buildMemoTransaction = (
 
   console.log('txn signature is: ', bs58.encode(tx.signatures[0]));
   return tx;
+};
+
+const buildSawpTransaction = async (
+  payer: Keypair
+): Promise<VersionedTransaction> => {
+  const swapTransaction = await swap(
+    payer,
+    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    10 * 1e6,
+    15
+  );
+  return swapTransaction;
 };
