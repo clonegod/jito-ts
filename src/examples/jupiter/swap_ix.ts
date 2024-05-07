@@ -16,7 +16,8 @@ export const swap = async (
   inputMint: string,
   outputMint: string,
   inputAmount: number,
-  slippageBps: number
+  slippageBps: number,
+  tipAccount: PublicKey
 ): Promise<VersionedTransaction> => {
   // Swapping SOL to USDC with input 0.1 SOL and 0.5% slippage
   const quote_url = `https://quote-api.jup.ag/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${inputAmount}&slippageBps=${slippageBps}`;
@@ -106,7 +107,7 @@ export const swap = async (
 
   const jitoBundleFee = web3.SystemProgram.transfer({
     fromPubkey: keypair.publicKey,
-    toPubkey: new PublicKey(''),
+    toPubkey: tipAccount,
     // lamports: web3.LAMPORTS_PER_SOL / 1000,
     lamports: tipLamports,
   });
