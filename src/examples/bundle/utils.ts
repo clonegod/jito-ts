@@ -40,14 +40,14 @@ export const sendBundles = async (
   let blockHash = await conn.getLatestBlockhash();
   const b = new Bundle([], bundleTransactionLimit);
 
-  console.log(blockHash.blockhash);
+  console.log('blockhash:', blockHash.blockhash);
 
   let bundles = [b];
 
   let maybeBundle = b.addTransactions(
     // buildMemoTransaction(keypair, 'jito test 1', blockHash.blockhash),
     // buildMemoTransaction(keypair, 'jito test 2', blockHash.blockhash)
-    buildMemoTransaction(keypair, 'jito + jupiter', blockHash.blockhash),
+    // buildMemoTransaction(keypair, 'jito + jupiter', blockHash.blockhash),
     await buildSawpTransaction(keypair)
   );
   if (isError(maybeBundle)) {
@@ -70,7 +70,7 @@ export const sendBundles = async (
   bundles.map(async b => {
     try {
       const resp = await c.sendBundle(b);
-      console.log('resp:', resp);
+      console.log('send bundle resp:', resp); // bundle's UUID
     } catch (e) {
       console.error('error sending bundle:', e);
     }
@@ -80,6 +80,7 @@ export const sendBundles = async (
 export const onBundleResult = (c: SearcherClient) => {
   c.onBundleResult(
     result => {
+      console.log(new Date().toLocaleTimeString());
       console.log('received bundle result:', result);
     },
     e => {

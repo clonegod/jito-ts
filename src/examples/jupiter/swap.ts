@@ -28,11 +28,11 @@ export const swap = async (
         // auto wrap and unwrap SOL. default is true
         wrapAndUnwrapSol: true,
         // The compute unit price to prioritize the transaction
-        // dynamicComputeUnitLimit: true,
+        dynamicComputeUnitLimit: true,
         // prioritizationFeeLamports: 'auto',
-        prioritizationFeeLamports: {
-          autoMultiplier: 2,
-        },
+        // prioritizationFeeLamports: {
+        //   autoMultiplier: 2,
+        // },
       }),
     })
   ).json();

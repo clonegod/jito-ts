@@ -45,7 +45,7 @@ const main = async () => {
 
 main()
   .then(() => {
-    console.log('Sending bundle');
+    console.log('Sending bundle', new Date().toLocaleTimeString());
   })
   .catch(e => {
     throw e;
