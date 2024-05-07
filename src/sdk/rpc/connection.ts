@@ -35,7 +35,8 @@ import {
 } from 'superstruct';
 import type {Agent as NodeHttpAgent} from 'http';
 import {Agent as NodeHttpsAgent} from 'https';
-import fetchImpl, {Response} from './fetch-impl';
+import fetchImpl from './fetch-impl';
+import {Response} from 'node-fetch';
 import HttpKeepAliveAgent, {
   HttpsAgent as HttpsKeepAliveAgent,
 } from 'agentkeepalive';
