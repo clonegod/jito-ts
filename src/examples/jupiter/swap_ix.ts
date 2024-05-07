@@ -66,7 +66,7 @@ export const swapIx = async (
   const deserializeInstruction = (instruction: TransactionInstruction) => {
     return new TransactionInstruction({
       programId: new PublicKey(instruction.programId),
-      keys: instruction.keys.map(key => ({
+      keys: instruction.keys?.map(key => ({
         pubkey: new PublicKey(key.pubkey),
         isSigner: key.isSigner,
         isWritable: key.isWritable,
