@@ -117,11 +117,9 @@ export const swapIx = async (
     payerKey: keypair.publicKey,
     recentBlockhash: blockhash,
     instructions: [
-      // uncomment if needed:
-      ...setupInstructions.map(deserializeInstruction),
+      // uncomment if needed:...setupInstructions.map(deserializeInstruction),
       deserializeInstruction(swapInstructionPayload),
-      // uncomment if needed:
-      deserializeInstruction(cleanupInstruction),
+      // uncomment if needed: deserializeInstruction(cleanupInstruction),
       jitoBundleFee,
     ],
   }).compileToV0Message(addressLookupTableAccounts);
