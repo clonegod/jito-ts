@@ -33,6 +33,7 @@ export const swap = async (
         // prioritizationFeeLamports: {
         //   autoMultiplier: 2,
         // },
+        onlyDirectRoutes: true,
       }),
     })
   ).json();
