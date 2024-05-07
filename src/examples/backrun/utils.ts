@@ -44,7 +44,7 @@ export const onAccountUpdates = async (
 
         maybeBundle = maybeBundle.addTipTx(
           keypair,
-          100_000_000,
+          10_000,
           tipAccount,
           resp.blockhash
         );
