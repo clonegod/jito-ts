@@ -124,12 +124,25 @@ const buildMemoTransaction = (
 const buildSawpTransaction = async (
   payer: Keypair
 ): Promise<VersionedTransaction> => {
+  const inputMint = process.env.INPUT_MINT || '';
+  console.log('INPUT_MINT:', inputMint);
+
+  const outputMint = process.env.OUPUT_MINT || '';
+  console.log('OUPUT_MINT:', outputMint);
+
+  const inputAmout = parseInt(process.env.INPUT_AMOUT || '0');
+  console.log('INPUT_AMOUT:', inputAmout);
+
+  const slippageBps = parseInt(process.env.SLIPPAGE_BPS || '30');
+  console.log('SLIPPAGE_BPS:', slippageBps);
+
   const swapTransaction = await swap(
     payer,
-    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-    10 * 1e6,
-    15
+    inputMint,
+    outputMint,
+    inputAmout,
+    slippageBps
   );
+
   return swapTransaction;
 };
