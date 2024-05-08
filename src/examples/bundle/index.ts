@@ -17,8 +17,8 @@ const main = async () => {
   );
   const keypair = Keypair.fromSecretKey(decodedKey);
 
-  const _accounts = (process.env.ACCOUNTS_OF_INTEREST || '').split(',');
-  console.log('ACCOUNTS_OF_INTEREST:', _accounts);
+  // const _accounts = (process.env.ACCOUNTS_OF_INTEREST || '').split(',');
+  // console.log('ACCOUNTS_OF_INTEREST:', _accounts);
   // const accounts = _accounts.map(a => new PublicKey(a));
 
   const bundleTransactionLimit = parseInt(

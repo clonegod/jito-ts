@@ -3,6 +3,7 @@ require('dotenv').config();
 import {Connection, Keypair, PublicKey} from '@solana/web3.js';
 import * as Fs from 'fs';
 import {swap} from './swap';
+import {getTokenConfig} from './config';
 
 const main = async () => {
   const connection = new Connection(
@@ -18,12 +19,20 @@ const main = async () => {
     )
   );
 
+  const inputTokenName = process.argv[2];
+  const outputTokenName = process.argv[3];
+  const inputUiAmout = parseFloat(process.argv[4]);
+  const slippageBps = parseInt(process.argv[5]);
+
+  const inputTokenConfig = getTokenConfig(inputTokenName);
+  const outputTokenConfig = getTokenConfig(outputTokenName);
+
   const transaction = await swap(
     payer,
-    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-    10 * 1e6,
-    15
+    inputTokenConfig,
+    outputTokenConfig,
+    inputUiAmout,
+    slippageBps
   );
 
   console.log(`transaction=`, JSON.stringify(transaction));

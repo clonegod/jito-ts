@@ -11,6 +11,7 @@ import {SearcherClient} from '../../sdk/block-engine/searcher';
 import {Bundle} from '../../sdk/block-engine/types';
 import {isError} from '../../sdk/block-engine/utils';
 import {swap} from '../jupiter/swap';
+import {getTokenConfig} from '../jupiter/config';
 const bs58 = require('bs58');
 
 const MEMO_PROGRAM_ID = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo';
@@ -53,14 +54,15 @@ export const sendBundles = async (
     throw maybeBundle;
   }
 
-  const tipLamports = parseInt(process.env.TIP_LAMPORTS || '1000');
+  // const tipLamports = parseInt(process.env.TIP_LAMPORTS || '1000');
+  // console.log('tip lamports:', tipLamports);
 
-  maybeBundle = maybeBundle.addTipTx(
-    keypair,
-    tipLamports,
-    tipAccount,
-    blockHash.blockhash
-  );
+  // maybeBundle = maybeBundle.addTipTx(
+  //   keypair,
+  //   tipLamports,
+  //   tipAccount,
+  //   blockHash.blockhash
+  // );
 
   if (isError(maybeBundle)) {
     throw maybeBundle;
@@ -126,23 +128,21 @@ const buildSawpTransaction = async (
   payer: Keypair,
   tipAccount: PublicKey
 ): Promise<VersionedTransaction> => {
-  const inputMint = process.env.INPUT_MINT || '';
-  console.log('INPUT_MINT:', inputMint);
+  console.dir(process.argv);
 
-  const outputMint = process.env.OUTPUT_MINT || '';
-  console.log('OUTPUT_MINT:', outputMint);
+  const inputTokenName = process.argv[2];
+  const outputTokenName = process.argv[3];
+  const inputUiAmout = parseFloat(process.argv[4]);
+  const slippageBps = parseInt(process.argv[5]);
 
-  const inputAmout = parseInt(process.env.INPUT_AMOUT || '0');
-  console.log('INPUT_AMOUT:', inputAmout);
-
-  const slippageBps = parseInt(process.env.SLIPPAGE_BPS || '30');
-  console.log('SLIPPAGE_BPS:', slippageBps);
+  const inputTokenConfig = getTokenConfig(inputTokenName);
+  const outputTokenConfig = getTokenConfig(outputTokenName);
 
   const swapTransaction = await swap(
     payer,
-    inputMint,
-    outputMint,
-    inputAmout,
+    inputTokenConfig,
+    outputTokenConfig,
+    inputUiAmout,
     slippageBps
   );
 

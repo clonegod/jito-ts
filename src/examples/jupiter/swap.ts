@@ -1,12 +1,20 @@
 import {Keypair, VersionedTransaction} from '@solana/web3.js';
+import {TokenConfig} from './config';
 
 export const swap = async (
   keypair: Keypair,
-  inputMint: string,
-  outputMint: string,
-  inputAmount: number,
+  inputTokenConfig: TokenConfig,
+  outpuTokenConfig: TokenConfig,
+  inputUiAmount: number,
   slippageBps: number
 ): Promise<VersionedTransaction> => {
+  const inputMint = inputTokenConfig.address;
+  const outputMint = outpuTokenConfig.address;
+  const inputAmount = inputUiAmount * 10 ** inputTokenConfig.decimals;
+
+  const tipLamports = parseInt(process.env.TIP_LAMPORTS || '1000');
+  console.log('tip lamports:', tipLamports);
+
   // Swapping SOL to USDC with input 0.1 SOL and 0.5% slippage
   const quote_url = `https://quote-api.jup.ag/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${inputAmount}&slippageBps=${slippageBps}`;
   console.log(quote_url);
@@ -30,11 +38,8 @@ export const swap = async (
         wrapAndUnwrapSol: true,
         // The compute unit price to prioritize the transaction
         dynamicComputeUnitLimit: true,
-        // prioritizationFeeLamports: 'auto',
-        // prioritizationFeeLamports: {
-        //   autoMultiplier: 2,
-        // },
         onlyDirectRoutes: false,
+        prioritizationFeeLamports: {jitoTipLamports: tipLamports},
       }),
     })
   ).json();
@@ -42,7 +47,6 @@ export const swap = async (
   // deserialize the transaction
   const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
   var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
-  // console.log(transaction)
 
   // sign the transaction
   transaction.sign([keypair]);
