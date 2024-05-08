@@ -129,8 +129,8 @@ const buildSawpTransaction = async (
   const inputMint = process.env.INPUT_MINT || '';
   console.log('INPUT_MINT:', inputMint);
 
-  const outputMint = process.env.OUPUT_MINT || '';
-  console.log('OUPUT_MINT:', outputMint);
+  const outputMint = process.env.OUTPUT_MINT || '';
+  console.log('OUTPUT_MINT:', outputMint);
 
   const inputAmout = parseInt(process.env.INPUT_AMOUT || '0');
   console.log('INPUT_AMOUT:', inputAmout);

@@ -11,7 +11,8 @@ export const swap = async (
   const quote_url = `https://quote-api.jup.ag/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${inputAmount}&slippageBps=${slippageBps}`;
   console.log(quote_url);
   const quoteResponse = await (await fetch(quote_url)).json();
-  console.log(JSON.stringify(quoteResponse));
+  console.dir(quoteResponse, {depth: null, colors: true});
+  // console.log(JSON.stringify(quoteResponse));
 
   // get serialized transactions for the swap
   const {swapTransaction} = await (
@@ -33,7 +34,7 @@ export const swap = async (
         // prioritizationFeeLamports: {
         //   autoMultiplier: 2,
         // },
-        onlyDirectRoutes: true,
+        onlyDirectRoutes: false,
       }),
     })
   ).json();
