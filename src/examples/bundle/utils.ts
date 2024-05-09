@@ -21,7 +21,7 @@ export const sendBundles = async (
   bundleTransactionLimit: number,
   keypair: Keypair,
   conn: Connection
-) => {
+): Promise<string> => {
   const _tipAccount = (await c.getTipAccounts())[0];
   console.log('tip account:', _tipAccount);
   const tipAccount = new PublicKey(_tipAccount);
@@ -38,17 +38,31 @@ export const sendBundles = async (
     await new Promise(r => setTimeout(r, 500));
   }
 
-  let blockHash = await conn.getLatestBlockhash();
+  // let blockHash = await conn.getLatestBlockhash();
+  // console.log('blockhash:', blockHash.blockhash);
+
   const b = new Bundle([], bundleTransactionLimit);
 
-  console.log('blockhash:', blockHash.blockhash);
+  console.log(
+    'buildSawpTransaction start',
+    formatTimeWithMilliseconds(new Date())
+  );
+  const swapTransaction = await buildSawpTransaction(conn, keypair, tipAccount);
+
+  console.log(
+    'buildSawpTransaction end',
+    formatTimeWithMilliseconds(new Date())
+  );
+
+  const txid = bs58.encode(swapTransaction.signatures[0]);
+  console.log(`https://solscan.io/tx/${txid}`);
 
   let bundles = [b];
 
   let maybeBundle = b.addTransactions(
     // buildMemoTransaction(keypair, 'jito test 1', blockHash.blockhash),
     // buildMemoTransaction(keypair, 'jito test 2', blockHash.blockhash),
-    await buildSawpTransaction(conn, keypair, tipAccount)
+    swapTransaction
   );
   if (isError(maybeBundle)) {
     throw maybeBundle;
@@ -76,13 +90,30 @@ export const sendBundles = async (
       console.error('error sending bundle:', e);
     }
   });
+
+  return txid;
 };
 
-export const onBundleResult = (c: SearcherClient) => {
+export const onBundleResult = (
+  c: SearcherClient,
+  connection: Connection,
+  txid: string,
+  acceptCallback: (txid: string) => void
+) => {
   c.onBundleResult(
-    result => {
-      console.log(new Date().toLocaleTimeString());
-      console.log('received bundle result:', result);
+    async result => {
+      console.log(
+        formatTimeWithMilliseconds(new Date()),
+        'received bundle result:',
+        result
+      );
+      if (result.rejected) {
+        console.log('failed! exit...');
+        process.exit(1);
+      }
+      if (result.accepted) {
+        acceptCallback(txid);
+      }
     },
     e => {
       throw e;
@@ -148,3 +179,28 @@ const buildSawpTransaction = async (
 
   return swapTransaction;
 };
+
+function formatTimeWithMilliseconds(date: Date) {
+  function pad(number: number) {
+    if (number < 10) {
+      return '0' + number;
+    }
+    return number;
+  }
+
+  return (
+    date.getFullYear() +
+    '-' +
+    pad(date.getMonth() + 1) +
+    '-' +
+    pad(date.getDate()) +
+    ' ' +
+    pad(date.getHours()) +
+    ':' +
+    pad(date.getMinutes()) +
+    ':' +
+    pad(date.getSeconds()) +
+    '.' +
+    pad(date.getMilliseconds())
+  );
+}

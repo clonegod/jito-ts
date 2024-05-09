@@ -5,9 +5,10 @@ import * as Fs from 'fs';
 
 import {searcherClient} from '../../sdk/block-engine/searcher';
 import {onBundleResult, sendBundles} from './utils';
+import {onAccountUpdates} from '../backrun/utils';
 
 const main = async () => {
-  const blockEngineUrl = process.env.BLOCK_ENGINE_URL || '';
+  const blockEngineUrl = process.argv[6] + process.env.BLOCK_ENGINE_URL || '';
   console.log('BLOCK_ENGINE_URL:', blockEngineUrl);
 
   const authKeypairPath = process.env.AUTH_KEYPAIR_PATH || '';
@@ -39,8 +40,25 @@ const main = async () => {
     )
   );
 
-  await sendBundles(c, bundleTransactionLimit, payer, conn);
-  onBundleResult(c);
+  const txid = await sendBundles(c, bundleTransactionLimit, payer, conn);
+  onBundleResult(c, conn, txid, async (txid: string) => {
+    await new Promise(r => setTimeout(r, 500));
+    console.log('SignatureStatus');
+    for (let i = 0; i < 30; i++) {
+      await new Promise(r => setTimeout(r, 50));
+      const rs = await conn.getSignatureStatus(txid, {
+        searchTransactionHistory: true,
+      });
+      console.log(formatTimeWithMilliseconds(new Date()), rs);
+      if (
+        rs.value?.confirmationStatus == 'confirmed' ||
+        rs.value?.confirmationStatus == 'finalized'
+      ) {
+        console.log('success');
+        break;
+      }
+    }
+  });
 };
 
 main()
@@ -50,3 +68,28 @@ main()
   .catch(e => {
     throw e;
   });
+
+function formatTimeWithMilliseconds(date: Date) {
+  function pad(number: number) {
+    if (number < 10) {
+      return '0' + number;
+    }
+    return number;
+  }
+
+  return (
+    date.getFullYear() +
+    '-' +
+    pad(date.getMonth() + 1) +
+    '-' +
+    pad(date.getDate()) +
+    ' ' +
+    pad(date.getHours()) +
+    ':' +
+    pad(date.getMinutes()) +
+    ':' +
+    pad(date.getSeconds()) +
+    '.' +
+    pad(date.getMilliseconds())
+  );
+}
